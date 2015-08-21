@@ -2,6 +2,6 @@
 
 namespace AuthorizationRequired;
 
-trait RequireAuthorization
+trait AuthorizationRequired
 {
 }
