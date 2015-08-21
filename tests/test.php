@@ -4,7 +4,7 @@ require_once __DIR__ . '/../vendor/autoload.php'; // Autoload files using Compos
 
 class TestClass
 {
-	use AuthorizationRequired\RequireAuthorization;
+	use AuthorizationRequired\AuthorizationRequired;
 
 	public function __construct()
 	{
@@ -13,4 +13,4 @@ class TestClass
 
 }
 
-new TestClass;
+$a = new TestClass;
