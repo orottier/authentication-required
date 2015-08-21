@@ -77,7 +77,7 @@ class Post extends Model
 
 	public function authorizationReadScope(Builder $query)
 	{
-		$userId = \Auth::check() ? \Auth::user()->id : null;
+		$userId = Auth::check() ? Auth::user()->id : null;
 		$query->where('published_at', '<=', date('Y-m-d H:i:s'))
 			->where('hidden', false)
 			->orWhere('user_id', $userId);
@@ -94,8 +94,8 @@ Users and the superadmin should be able to modify a post. Edit/Create/Delete rul
 ```php
 public function authorizationCanEdit()
 {
-	return \Auth::check() && $this->user_id === \Auth::user()->id
-		|| \Auth::user()->isSuperAdmin();
+	return Auth::check() && $this->user_id === Auth::user()->id
+		|| Auth::user()->isSuperAdmin();
 }
 ```
 
@@ -103,7 +103,7 @@ All users can create a post:
 ```php
 public function authorizationCanCreate()
 {
-	return \Auth::check();
+	return Auth::check();
 }
 ```
 Note: there's no hierarchy defined in the authorization rules. It is possible to prevent users from editing the posts they just created, if you wish.
