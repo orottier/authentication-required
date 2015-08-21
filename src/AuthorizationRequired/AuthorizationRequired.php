@@ -44,11 +44,11 @@ trait AuthorizationRequired
 	/**
 	 * Add the Read scope to the model
 	 *
-	 * @return void
+	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public static function authorizationReadScope(Builder $query)
 	{
-		$query->where(DB::raw(1), 2);
+		return $query->where(DB::raw(1), 2);
 	}
 
 	/**
