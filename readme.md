@@ -34,7 +34,7 @@ These functions define the rules of *reading*, *updating*, *creating* and *delet
 Calling `Model::find` will simply yield null if the the rules prevent the object to be seen (as if it did not exist). Your application has probably been configured to return a 404 status code in these cases.
 
 ### Write behaviour (update, create, delete)
-If the rules forbid writing the model, an `AuthorizationRequired\PermissionException`. Specifically: `EditPermissionException`, `CreatePermissionException` and `DeletePermissionException`. Your application can convert this into a nice 403 page using the `render` function in `App\Exception`.
+If the rules forbid writing the model, an `AuthorizationRequired\PermissionException` is thrown. Specifically: `EditPermissionException`, `CreatePermissionException` and `DeletePermissionException`. Your application can convert this into a nice 403 page using the `render` function in `App\Exception`.
 
 ## Example usage
 
