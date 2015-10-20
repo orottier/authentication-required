@@ -141,7 +141,7 @@ public function authorizationCanCreate()
 ```
 Note: there's no hierarchy defined in the authorization rules. It is possible to prevent users from editing the posts they just created, if you wish.
 
-Deleting a post is governed by the same rules as editing the post:
+We will set the rules for deleting a post equal to the rules for editing the post:
 ```PHP
 public function authorizationCanDelete()
 {
