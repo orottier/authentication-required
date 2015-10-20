@@ -2,6 +2,30 @@
 
 A simple and efficient authorization package for the Laravel framework
 
+## What this package can and cannot do
+This packages uses the available Eloquent hooks to impose rules for reading and writing your Models. No more, no less.
+
+Will protect:
+
+* Read access & creation of new models
+* Updates and deletes of models, invoked on the model itself
+
+
+Will not protect:
+
+* Raw queries: `DB::table('users')->delete()`
+* Mass updates and deletes: `User::where('role', 'admin')->delete()`
+
+Please note the fundamental difference between
+```
+User::find(12)->delete(); // Invokes delete on the User Model
+User::where('id', 12)->delete() // Invokes delete on the Eloquent Builder
+DB::table('users')->where('id', 12)->delete() // Invokes delete on the Query Builder
+DB::delete("DELETE FROM `users` WHERE `id` = 12") // Executes a raw query
+```
+
+This package will only protect guard deletes/updates of the first type. The latter three will pass no matter what rules you impose.
+
 ## Installation via Composer
 
 Note: this package can only be used in combination with the **Laravel** framework.
@@ -22,7 +46,7 @@ composer install
 ## How it works
 The Laravel models you want to protect should include the `AuthorizationRequired` trait. This puts the following methods on your model:
 ```PHP
-public function authorizationReadScope(\Illuminate\Database\Eloquent\Builder $query);
+public static function authorizationReadScope(\Illuminate\Database\Eloquent\Builder $query);
 public function authorizationCanEdit();
 public function authorizationCanCreate();
 public function authorizationCanDelete();
@@ -75,7 +99,7 @@ class Post extends Model
 {
 	use AuthorizationRequired;
 
-	public function authorizationReadScope(Builder $query)
+	public static function authorizationReadScope(Builder $query)
 	{
 		$userId = Auth::check() ? Auth::user()->id : null;
 		return $query->where('published_at', '<=', date('Y-m-d H:i:s'))
@@ -88,14 +112,23 @@ class Post extends Model
 }
 ```
 
+If you wish to impose no restrictions on read access, simply pass a trivial scope:
+
+```PHP
+public static function authorizationReadScope(Builder $query)
+{
+	return $query->whereRaw("1=1");
+}
+```
+
 ### Allow editing
 Users and the superadmin should be able to modify a post. Edit/Create/Delete rules are defined as ordinary functions on the model:
 
 ```PHP
 public function authorizationCanEdit()
 {
-	return Auth::check() && $this->user_id === Auth::user()->id
-		|| Auth::user()->isSuperAdmin();
+	return Auth::check()
+		&& ($this->user_id === Auth::user()->id || Auth::user()->isSuperAdmin());
 }
 ```
 
