@@ -112,12 +112,12 @@ class Post extends Model
 }
 ```
 
-If you wish to impose no restrictions on read access, simply pass a trivial scope:
+If you wish to impose no restrictions on read access, simply pass the query unaltered:
 
 ```PHP
 public static function authorizationReadScope(Builder $query)
 {
-	return $query->whereRaw("1=1");
+	return $query;
 }
 ```
 

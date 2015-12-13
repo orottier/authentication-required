@@ -10,6 +10,6 @@ class ReadOnlyPost extends Post
 
     public static function authorizationReadScope(Builder $query)
     {
-        return $query->whereRaw('1=1');
+        return $query;
     }
 }
