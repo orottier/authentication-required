@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class AuthorizationRequiredScope implements ScopeInterface
 {
-	public function apply(Builder $builder, Model $model)
-	{
-		$model::authorizationReadScope($builder);
-	}
+    public function apply(Builder $builder, Model $model)
+    {
+        $model::authorizationReadScope($builder);
+    }
 
-	public function remove(Builder $builder, Model $model)
-	{
-		//
-	}
+    public function remove(Builder $builder, Model $model)
+    {
+        //
+    }
 }

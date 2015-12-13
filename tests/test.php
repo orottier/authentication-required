@@ -4,13 +4,12 @@ require_once __DIR__ . '/../vendor/autoload.php'; // Autoload files using Compos
 
 class TestClass
 {
-	use AuthorizationRequired\AuthorizationRequired;
+    use AuthorizationRequired\AuthorizationRequired;
 
-	public function __construct()
-	{
-		echo "Hello world!" . PHP_EOL;
-	}
-
+    public function __construct()
+    {
+        echo 'Hello world!' . PHP_EOL;
+    }
 }
 
-$a = new TestClass;
+$a = new TestClass();
