@@ -47,7 +47,7 @@ composer install
 The Laravel models you want to protect should include the `AuthorizationRequired` trait. This puts the following methods on your model:
 ```PHP
 public static function authorizationReadScope(\Illuminate\Database\Eloquent\Builder $query);
-public function authorizationCanEdit();
+public function authorizationCanUpdate();
 public function authorizationCanCreate();
 public function authorizationCanDelete();
 ```
@@ -58,7 +58,7 @@ These functions define the rules of *reading*, *updating*, *creating* and *delet
 Calling `Model::find` will simply yield null if the the rules prevent the object to be seen (as if it did not exist). Your application has probably been configured to return a 404 status code in these cases.
 
 ### Write behaviour (update, create, delete)
-If the rules forbid writing the model, an `AuthorizationRequired\PermissionException` is thrown. Specifically: `EditPermissionException`, `CreatePermissionException` and `DeletePermissionException`. Your application can convert this into a nice 403 page using the `render` function in `App\Exception`.
+If the rules forbid writing the model, an `AuthorizationRequired\PermissionException` is thrown. Specifically: `UpdatePermissionException`, `CreatePermissionException` and `DeletePermissionException`. Your application can convert this into a nice 403 page using the `render` function in `App\Exception`.
 
 ## Example usage
 
@@ -122,10 +122,10 @@ public static function authorizationReadScope(Builder $query)
 ```
 
 ### Allow editing
-Users and the superadmin should be able to modify a post. Edit/Create/Delete rules are defined as ordinary functions on the model:
+Users and the superadmin should be able to modify a post. Update/Create/Delete rules are defined as ordinary functions on the model:
 
 ```PHP
-public function authorizationCanEdit()
+public function authorizationCanUpdate()
 {
 	return Auth::check()
 		&& ($this->user_id === Auth::user()->id || Auth::user()->isSuperAdmin());
@@ -145,7 +145,7 @@ We will set the rules for deleting a post equal to the rules for editing the pos
 ```PHP
 public function authorizationCanDelete()
 {
-	return $this->authorizationCanEdit();
+	return $this->authorizationCanUpdate();
 }
 ```
 

@@ -17,8 +17,8 @@ trait AuthorizationRequired
         static::addGlobalScope(new AuthorizationRequiredScope());
 
         self::updating(function ($self) {
-            if (!$self->authorizationCanEdit()) {
-                throw new EditPermissionException('Not allowed to edit this ' . class_basename($self));
+            if (!$self->authorizationCanUpdate()) {
+                throw new UpdatePermissionException('Not allowed to update this ' . class_basename($self));
             }
             return true;
         });
@@ -49,11 +49,11 @@ trait AuthorizationRequired
     }
 
     /**
-     * Rules for editing the model
+     * Rules for updating the model
      *
      * @return bool
      */
-    public function authorizationCanEdit()
+    public function authorizationCanUpdate()
     {
         return false;
     }
