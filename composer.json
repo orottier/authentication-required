@@ -22,5 +22,11 @@
         "laravel/laravel": "5.1.*",
         "orchestra/testbench": "^3.1",
         "phpunit/phpunit": "^5.1"
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/TestCase.php",
+            "tests/Models/Post.php"
+        ]
     }
 }
