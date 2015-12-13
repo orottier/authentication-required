@@ -16,13 +16,7 @@ class DatabaseTest extends TestCase
 
     public function testEloquent()
     {
-        $p = Post::create([
-            'user_id' => 1,
-            'published_at' => new DateTime(),
-            'title' => 'Hello',
-            'contents' => 'My second post',
-        ]);
-
+        $p = Post::create(self::postData());
         $this->assertSame($p->id, 1);
     }
 }

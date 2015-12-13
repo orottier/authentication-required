@@ -39,4 +39,14 @@ class TestCase extends Orchestra\Testbench\TestCase
             '--realpath' => realpath(__DIR__.'/migrations'),
         ]);
     }
+
+    protected static function postData()
+    {
+        return [
+            'user_id' => 1,
+            'published_at' => new DateTime(),
+            'title' => 'Hello',
+            'contents' => 'My first post',
+        ];
+    }
 }
