@@ -36,7 +36,7 @@ class TestCase extends Orchestra\Testbench\TestCase
         // path unless `--path` option is available.
         $this->artisan('migrate:refresh', [
             '--database' => 'testing',
-            '--realpath' => realpath(__DIR__.'/migrations'),
+            '--realpath' => realpath(__DIR__ . '/migrations'),
         ]);
     }
 
@@ -44,7 +44,7 @@ class TestCase extends Orchestra\Testbench\TestCase
     {
         return [
             'user_id' => 1,
-            'published_at' => new DateTime(),
+            'published_at' => new Carbon\Carbon(),
             'title' => 'Hello',
             'contents' => 'My first post',
         ];
