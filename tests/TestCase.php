@@ -40,13 +40,13 @@ class TestCase extends Orchestra\Testbench\TestCase
         ]);
     }
 
-    protected static function postData()
+    protected static function postData($fill = [])
     {
-        return [
+        return array_merge([
             'user_id' => 1,
             'published_at' => new Carbon\Carbon(),
             'title' => 'Hello',
             'contents' => 'My first post',
-        ];
+        ], $fill);
     }
 }
