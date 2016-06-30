@@ -20,21 +20,18 @@ trait AuthorizationRequired
             if (!$self->authorizationCanUpdate()) {
                 throw new UpdatePermissionException('Not allowed to update this ' . class_basename($self));
             }
-            return true;
         });
 
         self::creating(function ($self) {
             if (!$self->authorizationCanCreate()) {
                 throw new CreatePermissionException('Not allowed to create a ' . class_basename($self));
             }
-            return true;
         });
 
         self::deleting(function ($self) {
             if (!$self->authorizationCanDelete()) {
                 throw new DeletePermissionException('Not allowed to delete this ' . class_basename($self));
             }
-            return true;
         });
     }
 
