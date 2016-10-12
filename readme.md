@@ -18,10 +18,10 @@ Will not protect:
 
 Please note the fundamental difference between
 ```
-User::find(12)->delete(); // Invokes delete on the User Model
-User::where('id', 12)->delete() // Invokes delete on the Eloquent Builder
-DB::table('users')->where('id', 12)->delete() // Invokes delete on the Query Builder
-DB::delete("DELETE FROM `users` WHERE `id` = 12") // Executes a raw query
+✅ User::find(12)->delete(); // Invokes delete on the User Model
+❌ User::where('id', 12)->delete() // Invokes delete on the Eloquent Builder
+❌ DB::table('users')->where('id', 12)->delete() // Invokes delete on the Query Builder
+❌ DB::delete("DELETE FROM `users` WHERE `id` = 12") // Executes a raw query
 ```
 
 This package will only protect guard deletes/updates of the first type. The latter three will pass no matter what rules you impose.
@@ -30,35 +30,31 @@ This package will only protect guard deletes/updates of the first type. The latt
 
 Note: this package can only be used in combination with the **Laravel** framework.
 
-Add AuthorizationRequired to your composer.json file to use it in your project.
+Use `composer` to use AuthorizationRequired in your project
 
 ```
-"require" : {
-    "orottier/authorization-required" : "dev-master"
-}
-```
-
-And install via composer
-```
-composer install
+composer require orottier/authorization-required
+# (use version `1.*` for Laravel `5.2` and lower)
+# (use version `2.*` for Laravel `5.3` and above)
 ```
 
 ## How it works
-The Laravel models you want to protect should include the `AuthorizationRequired` trait. This puts the following methods on your model:
+The Laravel models you want to protect should include the `AuthorizationRequired` trait and should have an [authorization policy](http://laravel.com/docs/master/authorization) defined for `create`, `update` and `delete` actions.
+
+The following method is placed on your model:
 ```PHP
 public static function authorizationReadScope(\Illuminate\Database\Eloquent\Builder $query);
-public function authorizationCanUpdate();
-public function authorizationCanCreate();
-public function authorizationCanDelete();
 ```
 
-These functions define the rules of *reading*, *updating*, *creating* and *deleting* the model.
+Use this [query scope](http://laravel.com/docs/master/eloquent#query-scopes) to limit the read access of your model. Together with the authorization policy, the rules of *reading*, *updating*, *creating* and *deleting* the model are defined.
 
 ### Read behaviour
 Calling `Model::find` will simply yield null if the the rules prevent the object to be seen (as if it did not exist). Your application has probably been configured to return a 404 status code in these cases.
 
 ### Write behaviour (update, create, delete)
-If the rules forbid writing the model, an `AuthorizationRequired\PermissionException` is thrown. Specifically: `UpdatePermissionException`, `CreatePermissionException` and `DeletePermissionException`. Your application can convert this into a nice 403 page using the `render` function in `App\Exception`.
+If your policy rules forbid writing the model, an `AuthorizationRequired\PermissionException` is thrown. Specifically: `UpdatePermissionException`, `CreatePermissionException` and `DeletePermissionException`. Your application can convert this into a nice 403 page using the `render` function in `App\Exception`.
+
+Note that by Laravel's defaults, a missing rule will not allow any operations. Also, there must be a logged in user for any of the policies to be accepted.
 
 ## Example usage
 
@@ -75,9 +71,9 @@ use AuthorizationRequired\AuthorizationRequired;
 
 class Post extends Model
 {
-	use AuthorizationRequired;
+    use AuthorizationRequired;
 
-	// ...
+    // ...
 
 }
 ```
@@ -97,17 +93,20 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Post extends Model
 {
-	use AuthorizationRequired;
+    use AuthorizationRequired;
 
-	public static function authorizationReadScope(Builder $query)
-	{
-		$userId = Auth::check() ? Auth::user()->id : null;
-		return $query->where('published_at', '<=', date('Y-m-d H:i:s'))
-			->where('hidden', false)
-			->orWhere('user_id', $userId);
-	}
+    public static function authorizationReadScope(Builder $query)
+    {
+        if (Auth::check() && Auth::user()->isSuperAdmin()) {
+            return $query;
+        }
+        $userId = Auth::check() ? Auth::user()->id : null;
+        return $query->where('published_at', '<=', date('Y-m-d H:i:s'))
+            ->where('hidden', false)
+            ->orWhere('user_id', $userId);
+    }
 
-	// ...
+    // ...
 
 }
 ```
@@ -117,35 +116,43 @@ If you wish to impose no restrictions on read access, simply pass the query unal
 ```PHP
 public static function authorizationReadScope(Builder $query)
 {
-	return $query;
+    return $query;
 }
 ```
 
 ### Allow editing
-Users and the superadmin should be able to modify a post. Update/Create/Delete rules are defined as ordinary functions on the model:
+Update/Create/Delete rules should be defined as an [authorization policy](http://laravel.com/docs/master/authorization).
 
 ```PHP
-public function authorizationCanUpdate()
+<?php
+
+namespace App\Policies;
+
+use App\User;
+use App\Post;
+
+class PostPolicy
 {
-	return Auth::check()
-		&& ($this->user_id === Auth::user()->id || Auth::user()->isSuperAdmin());
-}
+    public function update(User $user, Post $post)
+    {
+        return Auth::check()
+            && ($post->user_id === $user->id || $user->isSuperAdmin());
+    }
 ```
 
 All users can create a post:
 ```PHP
-public function authorizationCanCreate()
+public function create(User $user)
 {
-	return Auth::check();
+    return true;
 }
 ```
-Note: there's no hierarchy defined in the authorization rules. It is possible to prevent users from editing the posts they just created, if you wish.
 
 We will set the rules for deleting a post equal to the rules for editing the post:
 ```PHP
-public function authorizationCanDelete()
+public function delete(User $user, Post $post)
 {
-	return $this->authorizationCanUpdate();
+    return $this->update($user, $post)
 }
 ```
 

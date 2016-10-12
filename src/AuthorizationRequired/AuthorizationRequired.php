@@ -4,6 +4,7 @@ namespace AuthorizationRequired;
 
 use Illuminate\Database\Eloquent\Builder;
 use DB;
+use Gate;
 
 trait AuthorizationRequired
 {
@@ -16,20 +17,20 @@ trait AuthorizationRequired
     {
         static::addGlobalScope(new AuthorizationRequiredScope());
 
-        self::updating(function ($self) {
-            if (!$self->authorizationCanUpdate()) {
-                throw new UpdatePermissionException('Not allowed to update this ' . class_basename($self));
-            }
-        });
-
         self::creating(function ($self) {
-            if (!$self->authorizationCanCreate()) {
+            if (!Gate::allows('create', get_class($self))) {
                 throw new CreatePermissionException('Not allowed to create a ' . class_basename($self));
             }
         });
 
+        self::updating(function ($self) {
+            if (!Gate::allows('update', $self)) {
+                throw new UpdatePermissionException('Not allowed to update this ' . class_basename($self));
+            }
+        });
+
         self::deleting(function ($self) {
-            if (!$self->authorizationCanDelete()) {
+            if (!Gate::allows('delete', get_class($self))) {
                 throw new DeletePermissionException('Not allowed to delete this ' . class_basename($self));
             }
         });
@@ -43,35 +44,5 @@ trait AuthorizationRequired
     public static function authorizationReadScope(Builder $query)
     {
         return $query->where(DB::raw(1), 2);
-    }
-
-    /**
-     * Rules for updating the model
-     *
-     * @return bool
-     */
-    public function authorizationCanUpdate()
-    {
-        return false;
-    }
-
-    /**
-     * Rules for creating the model
-     *
-     * @return bool
-     */
-    public function authorizationCanCreate()
-    {
-        return false;
-    }
-
-    /**
-     * Rules for deleting the model
-     *
-     * @return bool
-     */
-    public function authorizationCanDelete()
-    {
-        return false;
     }
 }
