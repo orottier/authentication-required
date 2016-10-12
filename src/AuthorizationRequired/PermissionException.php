@@ -2,8 +2,8 @@
 
 namespace AuthorizationRequired;
 
-use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
 
-class PermissionException extends Exception
+class PermissionException extends AuthorizationException
 {
 }
