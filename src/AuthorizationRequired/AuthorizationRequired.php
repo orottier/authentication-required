@@ -18,7 +18,7 @@ trait AuthorizationRequired
         static::addGlobalScope(new AuthorizationRequiredScope());
 
         self::creating(function ($self) {
-            if (!Gate::allows('create', get_class($self))) {
+            if (!Gate::allows('create', $self)) {
                 throw new CreatePermissionException('Not allowed to create a ' . class_basename($self));
             }
         });
@@ -30,7 +30,7 @@ trait AuthorizationRequired
         });
 
         self::deleting(function ($self) {
-            if (!Gate::allows('delete', get_class($self))) {
+            if (!Gate::allows('delete', $self)) {
                 throw new DeletePermissionException('Not allowed to delete this ' . class_basename($self));
             }
         });
